@@ -1,0 +1,31 @@
+public static void main(String[] args) {
+        boolean running = true;
+        while (running) {
+            showMainMenu();
+            String choice = sc.nextLine().trim();
+            switch (choice) {
+                case "1":
+                    showRegistrationScreen();
+                    break;
+                case "2":
+                    showLoginScreen();
+                    break;
+                case "3":
+                    sendMessages();
+                    break;
+                case "4":
+                    showSentMessages();
+                    break;
+                case "5":
+                    showReport();
+                    break;
+                case "6":
+                    System.out.println("\nGoodbye!");
+                    running = false;
+                    break;
+                default:
+                    System.out.println("\nInvalid option. Please enter 1 through 6.\n");
+                    break;
+            }
+        }
+    }
