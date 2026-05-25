@@ -1,0 +1,12 @@
+for (int counter = 1; counter <= amount; counter++) {
+            System.out.println("\n--- Entering Message " + counter + " of " + amount + " ---");
+            long id = 1000000000L + (long) (Math.random() * 9000000000L);
+            String cell = getCellNumber();
+            String msg = getMessageText();
+            MessageClass m = new MessageClass(id, cell, msg);
+
+            System.out.println("\nSelect an action for this message:");
+            System.out.println("1. Send Message");
+            System.out.println("0. Disregard Message");
+            System.out.println("2. Store Message to send later");
+            System.out.print("Choice: ");
