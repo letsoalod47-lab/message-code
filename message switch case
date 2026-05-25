@@ -1,0 +1,26 @@
+ switch (action) {
+                case 1:
+                    totalCount++;
+                    m.generateHash(totalCount);
+                    m.sent = true;
+                    processor.addMessage(m);
+                    System.out.println("Message successfully sent");
+                    System.out.println(m.getFullDetails());
+                    break;
+                case 2:
+                    totalCount++;
+                    m.generateHash(totalCount);
+                    m.stored = true;
+                    processor.addMessage(m);
+                    System.out.println("Message successfully stored");
+                    System.out.println(m.getFullDetails());
+                    break;
+                case 0:
+                    System.out.println("Message dropped from active operational memory.");
+                    break;
+                default:
+                    System.out.println("Invalid action. Message dropped.");
+                    break;
+            }
+        }
+    }
