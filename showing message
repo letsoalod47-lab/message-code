@@ -1,0 +1,16 @@
+static void showSentMessages() {
+        if (!loggedIn) {
+            System.out.println("\nPlease login first before using option 4.");
+            return;
+        }
+
+        List<MessageClass> sentMessages = processor.getSentMessages();
+        if (sentMessages.isEmpty()) {
+            System.out.println("\nNo sent messages available.");
+        } else {
+            System.out.println("\nRecently sent messages:");
+            for (MessageClass message : sentMessages) {
+                System.out.println(message.getFullDetails());
+            }
+        }
+    }
