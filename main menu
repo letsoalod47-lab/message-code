@@ -1,0 +1,5 @@
+ static void showMainMenu() {
+        System.out.println("========================================");
+        System.out.println("           CHAT APP - MAIN MENU         ");
+        System.out.println("========================================");
+        System.out.println(loggedIn ? "  Status: Logged in" : "  Status: Not logged in")
