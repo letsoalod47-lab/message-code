@@ -1,31 +1,52 @@
-public static void main(String[] args) {
+ public static void main(String[] args) {
         boolean running = true;
         while (running) {
-            showMainMenu();
+            showMenuHeaders();
             String choice = sc.nextLine().trim();
-            switch (choice) {
-                case "1":
-                    showRegistrationScreen();
-                    break;
-                case "2":
-                    showLoginScreen();
-                    break;
-                case "3":
-                    sendMessages();
-                    break;
-                case "4":
-                    showSentMessages();
-                    break;
-                case "5":
-                    showReport();
-                    break;
-                case "6":
-                    System.out.println("\nGoodbye!");
-                    running = false;
-                    break;
-                default:
-                    System.out.println("\nInvalid option. Please enter 1 through 6.\n");
-                    break;
+            
+            if (!loggedIn) {
+                // Pre-Login Flow (3 Options)
+                switch (choice) {
+                    case "1":
+                        showRegistrationScreen();
+                        break;
+                    case "2":
+                        showLoginScreen();
+                        break;
+                    case "3":
+                        System.out.println("\n========================================");
+                        System.out.println("  Thank you for using Chat App. Goodbye!");
+                        System.out.println("========================================");
+                        running = false;
+                        break;
+                    default:
+                        System.out.println("\n[✘] Invalid choice. Please enter 1, 2, or 3.\n");
+                        break;
+                }
+            } else {
+                // Post-Login Flow (4 Options)
+                switch (choice) {
+                    case "1":
+                        sendMessages();
+                        break;
+                    case "2":
+                        showRecentMessages();
+                        break;
+                    case "3":
+                        System.out.println("\n========================================");
+                        System.out.println("  Exiting QuickChat application...");
+                        System.out.println("  Total messages processed: " + totalCount);
+                        System.out.println("  Goodbye!");
+                        System.out.println("========================================");
+                        running = false;
+                        break;
+                    case "4":
+                        handleStoredMessagesMenu();
+                        break;
+                    default:
+                        System.out.println("\n[✘] Invalid choice. Please enter 1 through 4.\n");
+                        break;
+                }
             }
         }
     }
