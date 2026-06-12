@@ -4,7 +4,7 @@
                     m.generateHash(totalCount);
                     m.sent = true;
                     processor.addMessage(m);
-                    System.out.println("Message successfully sent");
+                    System.out.println("\n>>> [✔] Message successfully sent!");
                     System.out.println(m.getFullDetails());
                     break;
                 case 2:
@@ -12,15 +12,43 @@
                     m.generateHash(totalCount);
                     m.stored = true;
                     processor.addMessage(m);
-                    System.out.println("Message successfully stored");
+                    System.out.println("\n>>> [✔] Message successfully stored!");
                     System.out.println(m.getFullDetails());
                     break;
                 case 0:
-                    System.out.println("Message dropped from active operational memory.");
+                    System.out.println("\n[i] Message dropped from active memory.");
                     break;
                 default:
-                    System.out.println("Invalid action. Message dropped.");
+                    System.out.println("\n[✘] Invalid action choice. Message dropped.");
                     break;
+            }
+        }
+    }
+
+    static String getCellNumber() {
+        String num;
+        while (true) {
+            System.out.print("Enter recipient cell number: ");
+            num = sc.nextLine();
+            if (MessageClass.validatePhone(num)) {
+                return num;
+            }
+            System.out.println("[✘] Error: Cell phone number is incorrectly formatted or does not contain an international code.");
+        }
+    }
+
+    static String getMessageText() {
+        String txt;
+        while (true) {
+            System.out.print("Enter short message: ");
+            txt = sc.nextLine();
+            if (MessageClass.validateMsg(txt)) {
+                return txt;
+            }
+            if (txt.trim().isEmpty()) {
+                System.out.println("[✘] Error: Message cannot be empty.");
+            } else {
+                System.out.println("[✘] Error: Message must be under 250 characters.");
             }
         }
     }
