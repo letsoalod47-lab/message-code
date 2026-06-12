@@ -1,5 +1,9 @@
- static void showMainMenu() {
-        System.out.println("========================================");
-        System.out.println("           CHAT APP - MAIN MENU         ");
-        System.out.println("========================================");
-        System.out.println(loggedIn ? "  Status: Logged in" : "  Status: Not logged in")
+static void showMenuHeaders() {
+        if (!loggedIn) {
+            System.out.println("========================================");
+            System.out.println("               QUICK CHAT               ");
+            System.out.println("========================================");
+            System.out.println("  1. Register New Account");
+            System.out.println("  2. User Login");
+            System.out.println("  3. Exit Application");
+            System.out.println("========================================");
