@@ -1,0 +1,441 @@
+
+import java.util.List;
+import java.util.Scanner;
+
+public class Main {
+
+    static Scanner sc = new Scanner(System.in);
+    static Login registeredUser = null;
+    static String registeredFirstName = "";
+    static String registeredLastName = "";
+    static boolean loggedIn = false;
+    static MessageProcessor processor = new MessageProcessor();
+    static int totalCount = 0;
+
+    public static void main(String[] args) {
+        boolean running = true;
+        while (running) {
+            showMenuHeaders();
+            String choice = sc.nextLine().trim();
+            
+            if (!loggedIn) {
+                // Pre-Login Flow (3 Options)
+                switch (choice) {
+                    case "1":
+                        showRegistrationScreen();
+                        break;
+                    case "2":
+                        showLoginScreen();
+                        break;
+                    case "3":
+                        System.out.println("\n========================================");
+                        System.out.println("  Thank you for using Chat App. Goodbye!");
+                        System.out.println("========================================");
+                        running = false;
+                        break;
+                    default:
+                        System.out.println("\n[✘] Invalid choice. Please enter 1, 2, or 3.\n");
+                        break;
+                }
+            } else {
+                // Post-Login Flow (4 Options)
+                switch (choice) {
+                    case "1":
+                        sendMessages();
+                        break;
+                    case "2":
+                        showRecentMessages();
+                        break;
+                    case "3":
+                        System.out.println("\n========================================");
+                        System.out.println("  Exiting QuickChat application...");
+                        System.out.println("  Total messages processed: " + totalCount);
+                        System.out.println("  Goodbye!");
+                        System.out.println("========================================");
+                        running = false;
+                        break;
+                    case "4":
+                        handleStoredMessagesMenu();
+                        break;
+                    default:
+                        System.out.println("\n[✘] Invalid choice. Please enter 1 through 4.\n");
+                        break;
+                }
+            }
+        }
+    }
+
+    static void showMenuHeaders() {
+        if (!loggedIn) {
+            System.out.println("========================================");
+            System.out.println("               QUICK CHAT               ");
+            System.out.println("========================================");
+            System.out.println("  1. Register New Account");
+            System.out.println("  2. User Login");
+            System.out.println("  3. Exit Application");
+            System.out.println("========================================");
+        } else {
+            System.out.println("========================================");
+            System.out.println("          WELCOME TO QUICK CHAT         ");
+            System.out.println("========================================");
+            System.out.println("  1. Send Messages");
+            System.out.println("  2. Show recently sent messages");
+            System.out.println("  3. Quit");
+            System.out.println("  4. Stored messages");
+            System.out.println("========================================");
+        }
+        System.out.print("  Select an option: ");
+    }
+
+    static void showRegistrationScreen() {
+        System.out.println("\n========================================");
+        System.out.println("          NEW ACCOUNT REGISTRATION      ");
+        System.out.println("========================================");
+
+        System.out.print("  First Name    : ");
+        String firstName = sc.nextLine().trim();
+
+        System.out.print("  Last Name     : ");
+        String lastName = sc.nextLine().trim();
+
+        System.out.println("\n[Username Rules] Must contain '_' and be max 5 chars");
+        System.out.print("  Username      : ");
+        String username = sc.nextLine().trim();
+
+        System.out.println("\n[Password Rules] Min 8 chars, 1 Uppercase, 1 Number, 1 Special Char");
+        System.out.print("  Password      : ");
+        String password = sc.nextLine().trim();
+
+        System.out.println("\n[Cell Rules] Must start with '+' followed by country code");
+        System.out.print("  Cell Phone    : ");
+        String cellPhone = sc.nextLine().trim();
+
+        System.out.println("----------------------------------------");
+
+        Login user = new Login(firstName, lastName, username, password, cellPhone);
+        String result = user.registerUser();
+
+        if (result.contains("Username successfully")) {
+            registeredUser = user;
+            registeredFirstName = firstName;
+            registeredLastName = lastName;
+            loggedIn = false; 
+            System.out.println("\n[✔] Username successfully captured.");
+            System.out.println("[✔] Password successfully captured.");
+            System.out.println("[✔] Cell phone number successfully added.");
+            System.out.println("\n>>> REGISTRATION COMPLETE!");
+            System.out.println("Please log in using Option 2 to unlock chat features.");
+        } else {
+            System.out.println("\n[✘] REGISTRATION FAILED:");
+            System.out.println("  " + result.replace("\n", "\n  "));
+            System.out.println("Please try again.");
+        }
+        System.out.println("========================================\n");
+    }
+
+    static void showLoginScreen() {
+        System.out.println("\n========================================");
+        System.out.println("               USER LOGIN               ");
+        System.out.println("========================================");
+
+        if (registeredUser == null) {
+            System.out.println("  [✘] No account found. Please register first.");
+            System.out.println("========================================\n");
+            return;
+        }
+
+        System.out.print("  Username : ");
+        String username = sc.nextLine().trim();
+
+        System.out.print("  Password : ");
+        String password = sc.nextLine().trim();
+
+        System.out.println("----------------------------------------");
+
+        String status = registeredUser.returnLoginStatus(username, password);
+        System.out.println("  " + status);
+
+        if (registeredUser.loginUser(username, password)) {
+            loggedIn = true;
+            System.out.println("\n[✔] ACCESS GRANTED! Welcome to your message system.");
+        } else {
+            loggedIn = false;
+            System.out.println("\n[✘] ACCESS DENIED. Please check credentials.");
+        }
+        System.out.println("========================================\n");
+    }
+
+    static void sendMessages() {
+        System.out.print("How many messages do you want to enter? ");
+        int amount;
+        try {
+            amount = Integer.parseInt(sc.nextLine());
+        } catch (Exception e) {
+            System.out.println("[✘] Invalid batch count entry.");
+            return;
+        }
+
+        if (amount <= 0) {
+            System.out.println("[✘] Invalid quantity. Returning to Menu.");
+            return;
+        }
+
+        for (int counter = 1; counter <= amount; counter++) {
+            System.out.println("\n----------------------------------------");
+            System.out.println(" Entering Message " + counter + " of " + amount);
+            System.out.println("----------------------------------------");
+            
+            long id = 1000000000L + (long) (Math.random() * 9000000000L);
+            String cell = getCellNumber();
+            String msg = getMessageText();
+            MessageClass m = new MessageClass(id, cell, msg);
+
+            System.out.println("\nSelect an action for this message:");
+            System.out.println("  1. Send Message");
+            System.out.println("  0. Disregard Message");
+            System.out.println("  2. Store Message to send later");
+            System.out.print("Choice: ");
+
+            int action;
+            try {
+                action = Integer.parseInt(sc.nextLine());
+            } catch (Exception e) {
+                action = -1;
+            }
+
+            switch (action) {
+                case 1:
+                    totalCount++;
+                    m.generateHash(totalCount);
+                    m.sent = true;
+                    processor.addMessage(m);
+                    System.out.println("\n>>> [✔] Message successfully sent!");
+                    System.out.println(m.getFullDetails());
+                    break;
+                case 2:
+                    totalCount++;
+                    m.generateHash(totalCount);
+                    m.stored = true;
+                    processor.addMessage(m);
+                    System.out.println("\n>>> [✔] Message successfully stored!");
+                    System.out.println(m.getFullDetails());
+                    break;
+                case 0:
+                    System.out.println("\n[i] Message dropped from active memory.");
+                    break;
+                default:
+                    System.out.println("\n[✘] Invalid action choice. Message dropped.");
+                    break;
+            }
+        }
+    }
+
+    static String getCellNumber() {
+        String num;
+        while (true) {
+            System.out.print("Enter recipient cell number: ");
+            num = sc.nextLine();
+            if (MessageClass.validatePhone(num)) {
+                return num;
+            }
+            System.out.println("[✘] Error: Cell phone number is incorrectly formatted or does not contain an international code.");
+        }
+    }
+
+    static String getMessageText() {
+        String txt;
+        while (true) {
+            System.out.print("Enter short message: ");
+            txt = sc.nextLine();
+            if (MessageClass.validateMsg(txt)) {
+                return txt;
+            }
+            if (txt.trim().isEmpty()) {
+                System.out.println("[✘] Error: Message cannot be empty.");
+            } else {
+                System.out.println("[✘] Error: Message must be under 250 characters.");
+            }
+        }
+    }
+
+    static void showRecentMessages() {
+        List<MessageClass> sentMessages = processor.getSentMessages();
+        System.out.println("\n========================================");
+        System.out.println("         RECENTLY SENT MESSAGES         ");
+        System.out.println("========================================");
+        
+        if (sentMessages.isEmpty()) {
+            System.out.println("  No recently sent messages available.");
+        } else {
+            for (MessageClass message : sentMessages) {
+                // Show sender, recipient, and message only
+                System.out.println("  Sender   : " + registeredUser.getUsername());
+                System.out.println("  Recipient: " + message.phoneNum);
+                System.out.println("  Message  : " + message.msgText);
+                System.out.println("----------------------------------------");
+            }
+        }
+        System.out.println("========================================\n");
+    }
+
+    // Fully Functional Option 4 Stored Messages Sub-menu
+    static void handleStoredMessagesMenu() {
+        boolean inStoredMenu = true;
+        while (inStoredMenu) {
+            System.out.println("========================================");
+            System.out.println("          STORED MESSAGES MENU          ");
+            System.out.println("========================================");
+            System.out.println("  1. Display stored messages");
+            System.out.println("  2. Display longest message");
+            System.out.println("  3. SEARCH by message ID");
+            System.out.println("  4. Search by recipient");
+            System.out.println("  5. Delete by message hash");
+            System.out.println("  6. Display report");
+            System.out.println("  7. Back to menu");
+            System.out.println("========================================");
+            System.out.print("  Select an option: ");
+            
+            String choice = sc.nextLine().trim();
+            switch (choice) {
+                case "1":
+                    displayStoredMessages();
+                    break;
+                case "2":
+                    displayLongestMessage();
+                    break;
+                case "3":
+                    searchByMessageId();
+                    break;
+                case "4":
+                    searchByRecipient();
+                    break;
+                case "5":
+                    deleteByHash();
+                    break;
+                case "6":
+                    displayReport();
+                    break;
+                case "7":
+                    inStoredMenu = false;
+                    System.out.println("\nReturning to Main Menu...\n");
+                    break;
+                default:
+                    System.out.println("\n[✘] Invalid choice. Please enter 1 through 7.\n");
+                    break;
+            }
+        }
+    }
+
+    // Sub-Option 1: Display stored messages (Full details)
+    static void displayStoredMessages() {
+        List<MessageClass> stored = processor.getStoredMessages();
+        System.out.println("\n========================================");
+        System.out.println("          DISPLAY STORED MESSAGES       ");
+        System.out.println("========================================");
+        if (stored.isEmpty()) {
+            System.out.println("  No stored messages found.");
+        } else {
+            for (MessageClass message : stored) {
+                System.out.println(message.getFullDetails());
+            }
+            System.out.println("  Total stored messages: " + stored.size());
+        }
+        System.out.println("========================================\n");
+    }
+
+    // Sub-Option 2: Display longest message (Sender, Recipient, Message only)
+    static void displayLongestMessage() {
+        System.out.println("\n========================================");
+        System.out.println("          LONGEST STORED MESSAGE        ");
+        System.out.println("========================================");
+        MessageClass longest = processor.getLongestStoredMessage();
+        if (longest == null) {
+            System.out.println("  No stored messages available.");
+        } else {
+            System.out.println("  Sender   : " + registeredUser.getUsername());
+            System.out.println("  Recipient: " + longest.phoneNum);
+            System.out.println("  Message  : " + longest.msgText);
+        }
+        System.out.println("========================================\n");
+    }
+
+    // Sub-Option 3: SEARCH by message ID (Sender, Recipient, Message only)
+    static void searchByMessageId() {
+        System.out.print("\nEnter Message ID to search: ");
+        String searchInput = sc.nextLine().trim();
+        long idToSearch;
+        try {
+            idToSearch = Long.parseLong(searchInput);
+        } catch (Exception e) {
+            System.out.println("[✘] Invalid ID format.");
+            return;
+        }
+
+        System.out.println("\n========================================");
+        System.out.println("         MESSAGE SEARCH BY ID           ");
+        System.out.println("========================================");
+        MessageClass found = processor.findStoredMessageById(idToSearch);
+        if (found == null) {
+            System.out.println("  No stored message found with ID: " + idToSearch);
+        } else {
+            System.out.println("  Sender   : " + registeredUser.getUsername());
+            System.out.println("  Recipient: " + found.phoneNum);
+            System.out.println("  Message  : " + found.msgText);
+        }
+        System.out.println("========================================\n");
+    }
+
+    // Sub-Option 4: Search by recipient (Sender, Recipient, Message only)
+    static void searchByRecipient() {
+        System.out.print("\nEnter Recipient cell number to search: ");
+        String recipientInput = sc.nextLine().trim();
+
+        System.out.println("\n========================================");
+        System.out.println("       MESSAGE SEARCH BY RECIPIENT      ");
+        System.out.println("========================================");
+        List<MessageClass> matches = processor.findStoredMessagesForRecipient(recipientInput);
+        if (matches.isEmpty()) {
+            System.out.println("  No stored messages found for recipient: " + recipientInput);
+        } else {
+            for (MessageClass message : matches) {
+                System.out.println("  Sender   : " + registeredUser.getUsername());
+                System.out.println("  Recipient: " + message.phoneNum);
+                System.out.println("  Message  : " + message.msgText);
+                System.out.println("----------------------------------------");
+            }
+        }
+        System.out.println("========================================\n");
+    }
+
+    // Sub-Option 5: Delete by message hash
+    static void deleteByHash() {
+        System.out.print("\nEnter Message Hash to delete: ");
+        String hashInput = sc.nextLine().trim();
+        System.out.println("\n========================================");
+        System.out.println("         DELETE MESSAGE BY HASH         ");
+        System.out.println("========================================");
+        boolean success = processor.deleteMessageByHash(hashInput);
+        if (success) {
+            System.out.println("  [✔] Message successfully deleted from storage.");
+        } else {
+            System.out.println("  [✘] Delete failed. No message matching that Hash.");
+        }
+        System.out.println("========================================\n");
+    }
+
+    // Sub-Option 6: Display report (Full details + counts)
+    static void displayReport() {
+        System.out.println("\n========================================");
+        System.out.println("             SYSTEM REPORT              ");
+        System.out.println("========================================");
+        String report = processor.getReport();
+        if (report.trim().equals("[SYSTEM GENERATED MESSAGE REPORT]\n----------------------------------------")) {
+            System.out.println("  No sent/stored messages available to report.");
+        } else {
+            System.out.print(report);
+        }
+        System.out.println("  Total Messages Processed: " + totalCount);
+        System.out.println("  Total Messages Stored   : " + processor.getStoredMessages().size());
+        System.out.println("========================================\n");
+    }
+}
