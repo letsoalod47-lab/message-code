@@ -1,17 +1,9 @@
-if (!loggedIn) {
-            System.out.println("  Note: Options 3, 4, and 5 require login.");
-        }
-        System.out.println("  1. Register");
-        System.out.println("  2. Login");
-        if (loggedIn) {
-            System.out.println("  3. Send Messages");
-            System.out.println("  4. Show recently sent messages(Coming Soon)");
-            System.out.println("  5. Display report");
+ if (registeredUser.loginUser(username, password)) {
+            loggedIn = true;
+            System.out.println("\n[✔] ACCESS GRANTED! Welcome to your message system.");
         } else {
-            System.out.println("  3. Send Messages (login required)");
-            System.out.println("  4. Show recently sent messages (login required)");
-            System.out.println("  5. Display report (login required)");
+            loggedIn = false;
+            System.out.println("\n[✘] ACCESS DENIED. Please check credentials.");
         }
-        System.out.println("  6. Exit");
-        System.out.println("========================================");
-        System.out.print("  Select an option: ");
+        System.out.println("========================================\n");
+    }
