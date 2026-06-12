@@ -1,16 +1,13 @@
-static void showSentMessages() {
-        if (!loggedIn) {
-            System.out.println("\nPlease login first before using option 4.");
+static void sendMessages() {
+        System.out.print("How many messages do you want to enter? ");
+        int amount;
+        try {
+            amount = Integer.parseInt(sc.nextLine());
+        } catch (Exception e) {
+            System.out.println("[✘] Invalid batch count entry.");
             return;
         }
 
-        List<MessageClass> sentMessages = processor.getSentMessages();
-        if (sentMessages.isEmpty()) {
-            System.out.println("\nNo sent messages available.");
-        } else {
-            System.out.println("\nRecently sent messages:");
-            for (MessageClass message : sentMessages) {
-                System.out.println(message.getFullDetails());
-            }
-        }
-    }
+        if (amount <= 0) {
+            System.out.println("[✘] Invalid quantity. Returning to Menu.");
+            return;
